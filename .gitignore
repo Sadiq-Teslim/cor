@@ -8,5 +8,5 @@ uploads/
 temp/
 *.sql
 *.md
+!README.md
 *.ps1
-
