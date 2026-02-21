@@ -67,7 +67,7 @@ router.post(
         context = healthContext;
       }
 
-      const responseText = await generateResponse(transcript, language, context);
+      const responseText = await generateResponse(transcript, language, context, userId);
 
       res.json({
         success: true,

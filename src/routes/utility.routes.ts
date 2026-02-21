@@ -131,11 +131,6 @@ router.post("/clinical-share", async (req: Request, res: Response) => {
       });
     }
 
-    const user = dataStore.getUser(userId);
-    const readings = dataStore.getReadings(userId, parseInt(days));
-    const baseline = dataStore.getBaseline(userId);
-    const medicalRecords = dataStore.getMedicalRecords(userId);
-
     const user = await dataStore.getUser(userId);
     const readings = await dataStore.getReadings(userId, parseInt(days));
     const baseline = await dataStore.getBaseline(userId);

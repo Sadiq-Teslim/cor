@@ -4,6 +4,7 @@ import { validate, readingValidation } from "../middleware/validation";
 import { dataStore } from "../store/supabase-store";
 import { DailyReading, Baseline } from "../types";
 import { estimateBPFromHRV, getBPCategory } from "../utils/bp-estimation";
+import { supabase } from "../config/supabase";
 
 const router = Router();
 
@@ -359,6 +360,53 @@ router.post("/bp-estimate", async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       error: { message: error.message, code: "BP_ESTIMATION_ERROR" },
+    });
+  }
+});
+
+/**
+ * GET /api/health/alerts
+ * Get alert history for user
+ */
+router.get("/alerts", async (req: Request, res: Response) => {
+  try {
+    const { userId, days = "30" } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        error: { message: "User ID is required", code: "MISSING_USER_ID" },
+      });
+    }
+
+    // Get daily alerts from database
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - parseInt(days as string));
+
+    const { data, error } = await supabase
+      .from("daily_alerts")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("has_alerted", true)
+      .gte("date", cutoffDate.toISOString().split("T")[0])
+      .order("date", { ascending: false });
+
+    if (error) throw new Error(`Failed to get alerts: ${error.message}`);
+
+    const alerts = (data || []).map((a) => ({
+      date: a.date,
+      hasAlerted: a.has_alerted,
+      createdAt: a.created_at,
+    }));
+
+    res.json({
+      success: true,
+      data: { alerts },
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: { message: error.message, code: "ALERTS_FETCH_ERROR" },
     });
   }
 });

@@ -39,6 +39,19 @@ router.post("/onboard", async (req: Request, res: Response) => {
       smartwatchType: onboardingData.smartwatchType,
     });
 
+    // Store onboarding answers for Groq context
+    const answers = req.body.answers || {};
+    if (Object.keys(answers).length > 0) {
+      for (const [questionKey, answer] of Object.entries(answers)) {
+        await dataStore.saveOnboardingAnswer(
+          user.id,
+          questionKey,
+          typeof answer === "string" ? answer : JSON.stringify(answer),
+          answer
+        );
+      }
+    }
+
     res.status(201).json({
       success: true,
       data: { user },
