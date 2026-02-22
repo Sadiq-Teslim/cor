@@ -13,11 +13,17 @@ router.post("/onboard", async (req: Request, res: Response) => {
     const onboardingData: OnboardingData = req.body;
 
     // Validate required fields
-    if (!onboardingData.name || !onboardingData.age || !onboardingData.biologicalSex || !onboardingData.preferredLanguage) {
+    if (
+      !onboardingData.name ||
+      !onboardingData.age ||
+      !onboardingData.biologicalSex ||
+      !onboardingData.preferredLanguage
+    ) {
       return res.status(400).json({
         success: false,
         error: {
-          message: "Name, age, biological sex, and preferred language are required",
+          message:
+            "Name, age, biological sex, and preferred language are required",
           code: "MISSING_REQUIRED_FIELDS",
         },
       });
@@ -27,7 +33,10 @@ router.post("/onboard", async (req: Request, res: Response) => {
     let meds: string[] = [];
     const rawMeds = onboardingData.medications;
     if (typeof rawMeds === "string") {
-      meds = (rawMeds as string).toLowerCase() === "no" || rawMeds === "" ? [] : [rawMeds as string];
+      meds =
+        (rawMeds as string).toLowerCase() === "no" || rawMeds === ""
+          ? []
+          : [rawMeds as string];
     } else if (Array.isArray(rawMeds)) {
       meds = rawMeds;
     }
@@ -65,7 +74,7 @@ router.post("/onboard", async (req: Request, res: Response) => {
           user.id,
           questionKey,
           typeof answer === "string" ? answer : JSON.stringify(answer),
-          answer
+          answer,
         );
       }
     }
@@ -141,4 +150,3 @@ router.put("/:userId", async (req: Request, res: Response) => {
 });
 
 export default router;
-
