@@ -14,7 +14,7 @@ COR transforms smartphone sensor data into structured cardiovascular intelligenc
 
 The backend is responsible for:
 
-* PPG signal preprocessing
+* rPPG signal preprocessing
 * Feature extraction (HRV & pulse morphology)
 * Blood pressure estimation
 * Longitudinal trend modeling
