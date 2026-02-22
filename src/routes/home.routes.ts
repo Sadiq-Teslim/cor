@@ -89,15 +89,39 @@ router.get("/data", async (req: Request, res: Response) => {
         time: m.reminderTime,
       }));
 
-    // Get last reading
-    const lastReading =
-      readings.length > 0
-        ? {
-            date: readings[readings.length - 1].date,
-            hrv: readings[readings.length - 1].hrv,
-            heartRate: readings[readings.length - 1].heartRate,
-          }
-        : undefined;
+    // Get last reading (merge with BP data if available)
+    const bpReadings = await dataStore.getBPReadings(userId as string, 7);
+    const latestBP = bpReadings.length > 0 ? bpReadings[0] : null; // sorted desc
+
+    let lastReading: any = undefined;
+    if (readings.length > 0) {
+      const lastDaily = readings[readings.length - 1];
+      lastReading = {
+        date: lastDaily.date,
+        hrv: lastDaily.hrv,
+        heartRate: lastDaily.heartRate,
+      };
+      // Merge BP values from the same day if available
+      if (latestBP && latestBP.date === lastDaily.date) {
+        lastReading.systolic = latestBP.systolic;
+        lastReading.diastolic = latestBP.diastolic;
+        lastReading.category = latestBP.confidence;
+      } else if (latestBP) {
+        // Show latest BP even if from a different day
+        lastReading.systolic = latestBP.systolic;
+        lastReading.diastolic = latestBP.diastolic;
+        lastReading.bpDate = latestBP.date;
+      }
+    } else if (latestBP) {
+      // No daily readings but BP exists
+      lastReading = {
+        date: latestBP.date,
+        hrv: latestBP.hrv,
+        heartRate: latestBP.heartRate,
+        systolic: latestBP.systolic,
+        diastolic: latestBP.diastolic,
+      };
+    }
 
     // Get today's tip (generate inline to avoid circular dependency)
     let todayTip = null;

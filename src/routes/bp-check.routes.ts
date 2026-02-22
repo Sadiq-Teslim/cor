@@ -98,6 +98,19 @@ router.post("/", async (req: Request, res: Response) => {
       feelingNote,
     });
 
+    // Also update the daily readings table so dashboard/history reflect new HR/HRV
+    const existingReadings = await dataStore.getReadings(userId);
+    const todayReading = existingReadings.find((r) => r.date === today);
+    await dataStore.addReading(userId, {
+      date: today,
+      hrv,
+      heartRate,
+      sedentaryHours: todayReading?.sedentaryHours ?? 0,
+      sleepQuality: todayReading?.sleepQuality ?? 7,
+      screenStressIndex: todayReading?.screenStressIndex ?? null,
+      foodImpact: todayReading?.foodImpact ?? null,
+    });
+
     res.json({
       success: true,
       data: {
