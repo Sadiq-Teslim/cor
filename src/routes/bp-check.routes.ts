@@ -51,7 +51,7 @@ router.post("/", async (req: Request, res: Response) => {
       hrv,
       baseline.hrv,
       user.age,
-      user.biologicalSex
+      user.biologicalSex,
     );
     const category = getBPCategory(estimate.systolic, estimate.diastolic);
 
@@ -91,8 +91,7 @@ router.post("/", async (req: Request, res: Response) => {
         "Your reading today is lower than your average this week. Keep up the good work!";
       recommendation = "Continue maintaining your healthy habits.";
     } else {
-      message =
-        "Your reading today is consistent with your average this week.";
+      message = "Your reading today is consistent with your average this week.";
       recommendation = "You're maintaining a steady pattern.";
     }
 
@@ -149,4 +148,3 @@ router.post("/", async (req: Request, res: Response) => {
 });
 
 export default router;
-

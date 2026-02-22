@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { dataStore } from "../store/supabase-store";
-import { estimateBPFromHRV } from "../utils/bp-estimation";
+import { estimateBPFromHRV, getBPCategory } from "../utils/bp-estimation";
 
 const router = Router();
 
@@ -84,12 +84,17 @@ router.post("/", async (req: Request, res: Response) => {
       confidence: estimate.confidence,
     });
 
+    // Get BP category for risk indicator
+    const category = getBPCategory(estimate.systolic, estimate.diastolic);
+
     res.json({
       success: true,
       data: {
         message,
         hrvStatus,
         reading: {
+          systolic: estimate.systolic,
+          diastolic: estimate.diastolic,
           hrv,
           heartRate,
           date: today,
@@ -99,6 +104,7 @@ router.post("/", async (req: Request, res: Response) => {
           diastolic: estimate.diastolic,
           confidence: estimate.confidence,
         },
+        category,
       },
     });
   } catch (error: any) {
