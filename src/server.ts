@@ -27,8 +27,25 @@ import settingsRoutes from "./routes/settings.routes";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Security middleware
-app.use(helmet());
+// Security middleware - configure helmet to allow audio cross-origin
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        mediaSrc: ["'self'", "blob:", "data:", "*"],
+      },
+    },
+  })
+);
+
+// Additional CORS headers for audio routes (must come after helmet)
+app.use("/api/audio", (req, res, next) => {
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  next();
+});
 
 // CORS configuration
 const corsOptions = {
