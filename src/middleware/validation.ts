@@ -43,7 +43,7 @@ export const readingValidation = [
 export const respondValidation = [
   body("transcript").isString().notEmpty().withMessage("Transcript is required"),
   body("language").isString().notEmpty().withMessage("Language is required"),
-  body("healthContext").isObject().withMessage("Health context is required"),
+  body("healthContext").optional().isObject().withMessage("Health context must be an object"),
 ];
 
 export const speakValidation = [

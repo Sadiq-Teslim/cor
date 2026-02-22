@@ -42,7 +42,7 @@ router.post(
       // Otherwise, return a placeholder
 
       const record: MedicalRecord = {
-        id: `record_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: crypto.randomUUID(),
         userId,
         fileName,
         extractedData: {

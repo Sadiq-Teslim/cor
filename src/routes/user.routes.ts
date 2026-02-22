@@ -23,13 +23,26 @@ router.post("/onboard", async (req: Request, res: Response) => {
       });
     }
 
+    // Normalize medications — frontend may send string like "No" or "Yes"
+    let meds = onboardingData.medications;
+    if (typeof meds === "string") {
+      meds = meds.toLowerCase() === "no" || meds === "" ? [] : [meds];
+    }
+    if (!Array.isArray(meds)) meds = [];
+
+    // Normalize hasHypertension — frontend may send string "Yes"/"No"/"Not sure"
+    let hypertension = onboardingData.hasHypertension;
+    if (typeof hypertension === "string") {
+      hypertension = hypertension.toLowerCase() === "yes";
+    }
+
     const user = await dataStore.createUser({
       name: onboardingData.name,
       age: onboardingData.age,
       biologicalSex: onboardingData.biologicalSex,
       preferredLanguage: onboardingData.preferredLanguage,
-      hasHypertension: onboardingData.hasHypertension,
-      medications: onboardingData.medications,
+      hasHypertension: hypertension as boolean | undefined,
+      medications: meds as string[],
       smokes: onboardingData.smokes,
       drinksAlcohol: onboardingData.drinksAlcohol,
       activityLevel: onboardingData.activityLevel,
